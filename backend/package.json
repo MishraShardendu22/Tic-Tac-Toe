@@ -1,20 +1,23 @@
 {
-  "name": "tic-tac-toe",
+  "name": "backend",
   "version": "1.0.0",
-  "description": "This is a tic-tac-toe React Application!",
   "main": "index.js",
   "scripts": {
-    "start" : "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
   },
-  "author": "Shardendu Mishra",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
+  "description": "",
   "dependencies": {
-    "axios": "^1.7.7",
-    "colors": "^1.4.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "nodemon": "^3.1.7"
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.8.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
   }
 }
