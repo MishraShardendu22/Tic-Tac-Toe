@@ -1,12 +1,21 @@
-import express from 'express';
+import colors from "colors";
 
+import dotenv from "dotenv";
+dotenv.config();
+const PORT = process.env.PORT || 5000;
+
+import express from "express";
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-  res.send('Hello, TypeScript with Express!');
-});
+// Test Commnand Start
+
+app.get("/", (req,res) => {
+  res.status(200).send("This is a test command to check if the server is running !!");
+})
+
+// Test Commnand End
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+  console.log(`Click to connect : http://localhost:${PORT}`.green.bold);
+  console.log(`Server is running on port ${PORT}`.blue.bold);
+})
