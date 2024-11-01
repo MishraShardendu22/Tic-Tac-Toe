@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Trophy, X, Circle } from 'lucide-react';
 
 const App = () => {
@@ -83,6 +83,7 @@ const App = () => {
       </div>
 
       <div className="relative z-10 max-w-2xl w-full space-y-8">
+        {/* Header Component TicTacToe Part*/}
         <div className="text-center space-y-2">
           <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-pink-300">
             Tic Tac Toe
@@ -90,19 +91,24 @@ const App = () => {
           <p className="text-white/60">A classic game with a modern twist</p>
         </div>
 
+        {/* Which Player is active */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <PlayerCard player="X" isActive={currentPlayer === 'X' && !winner} />
           <PlayerCard player="O" isActive={currentPlayer === 'O' && !winner} />
         </div>
 
-        <div className="backdrop-blur-xl bg-white/5 p-8 rounded-xl border border-white/10">
-          <div className="grid grid-cols-3 gap-4 w-fit mx-auto">
-            {squares.map((value, index) => (
-              <Square key={index} value={value} onClick={() => handleClick(index)} />
-            ))}
+        {/* Game Board */}
+        {!(winner || isDraw) &&
+          <div className="backdrop-blur-xl bg-white/5 p-8 rounded-xl border border-white/10">
+            <div className="grid grid-cols-3 gap-4 w-fit mx-auto">
+              {squares.map((value, index) => (
+                <Square key={index} value={value} onClick={() => handleClick(index)} />
+              ))}
+            </div>
           </div>
-        </div>
+        }
 
+        {/* Winner or Draw */}
         {(winner || isDraw) && (
           <div className="text-center space-y-4">
             <div className="inline-block px-6 py-3 bg-white/10 backdrop-blur-lg rounded-xl border border-white/10">
