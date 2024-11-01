@@ -1,23 +1,13 @@
-import cookieParser from "cookie-parser";
-import { createServer } from "http";
-import { Server } from "socket.io";
 import express from "express";
+import { createServer } from "http";
+import { Server, Socket } from "socket.io";
+import dotenv from "dotenv";
 import cors from "cors";
 
-import dotenv from "dotenv";
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 const app = express();
-
-app.use(express.urlencoded({ extended: true })); // Parses URL-encoded data (forms)
-app.use(express.json());                         // Parses JSON data
-app.use(cookieParser());                         // Parses cookies
-app.use(cors({
-  origin: "http://localhost:5173",
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-}));
-
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -26,32 +16,51 @@ const io = new Server(httpServer, {
   },
 });
 
-// Test Command Start
-app.get("/", (req, res) => {
-  res.status(200).json({ "message": "This is a test command to check if the server is running!" });
-});
-// Test Command End
+app.use(cors());
 
-const allUsers = {}
-const allRooms = []
-
-
+let waitingPlayer: Socket | null = null;
 
 io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
+  console.log("User connected:", socket.id);
 
-  socket.on("message", (data) => {
-    console.log("Message received:", data);
-    io.emit("message", data);
+  socket.on("findMatch", () => {
+    if (waitingPlayer) {
+      const opponent = waitingPlayer;
+      waitingPlayer = null;
+
+      const isFirstPlayerX = Math.random() < 0.5;
+      const gameData = {
+        playerX: isFirstPlayerX ? socket.id : opponent.id,
+        playerO: isFirstPlayerX ? opponent.id : socket.id,
+      };
+
+      socket.join(gameData.playerX);
+      socket.join(gameData.playerO);
+      io.to(gameData.playerX).emit("matchFound", {
+        symbol: "X",
+        opponentId: gameData.playerO,
+      });
+      io.to(gameData.playerO).emit("matchFound", {
+        symbol: "O",
+        opponentId: gameData.playerX,
+      });
+    } else {
+      waitingPlayer = socket;
+    }
+  });
+
+  socket.on("makeMove", ({ index, symbol, room }) => {
+    io.to(room).emit("moveMade", { index, symbol });
   });
 
   socket.on("disconnect", () => {
-    console.log("A user disconnected:", socket.id);
+    if (waitingPlayer?.id === socket.id) {
+      waitingPlayer = null;
+    }
+    console.log("User disconnected:", socket.id);
   });
 });
 
-// Start the server
 httpServer.listen(PORT, () => {
-  console.log(`Click to connect : http://localhost:${PORT}`);
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
